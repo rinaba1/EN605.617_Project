@@ -171,8 +171,23 @@ struct LaunchInput {
 	float target_radius_yds{};
 };
 
+static void print_usage(const char *prog) {
+	std::cout
+		<< "Usage:\n  " << prog
+		<< " <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds>\n";
+}
+
 static bool parse_args(int argc, char **argv, LaunchInput &out) {
+	if (argc == 2) {
+		const std::string arg = argv[1];
+		if (arg == "-h" || arg == "--help") {
+			print_usage(argv[0]);
+			return false;
+		}
+	}
 	if (argc != 8) {
+		std::cerr << "Error: expected 7 arguments, got " << (argc - 1) << ".\n";
+		print_usage(argv[0]);
 		return false;
 	}
 	try {
@@ -184,6 +199,8 @@ static bool parse_args(int argc, char **argv, LaunchInput &out) {
 		out.target_dist_yds = std::stof(argv[6]);
 		out.target_radius_yds = std::stof(argv[7]);
 	} catch (...) {
+		std::cerr << "Error: failed to parse one or more arguments.\n";
+		print_usage(argv[0]);
 		return false;
 	}
 	return true;
