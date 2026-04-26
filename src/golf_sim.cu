@@ -255,6 +255,12 @@ int main(int argc, char **argv) {
 		"output/csv/results_sim" + std::to_string(input.simulation_id) + ".csv";
 
 	std::ofstream out(results_csv);
+	if (!out.is_open()) {
+		std::cerr << "Error: failed to open output CSV: " << results_csv
+				  << "\n";
+		CUDA_CHECK(cudaFree(d_landing_points));
+		return 1;
+	}
 	out << "lateral_yds,carry_yds\n";
 
 	for (int i = 0; i < num_shots; ++i) {
@@ -272,6 +278,14 @@ int main(int argc, char **argv) {
 		if (distance_to_target_center <= input.target_radius_yds) {
 			++num_hits;
 		}
+	}
+
+	out.close();
+	if (out.fail()) {
+		std::cerr << "Error: failed while writing/closing CSV: " << results_csv
+				  << "\n";
+		CUDA_CHECK(cudaFree(d_landing_points));
+		return 1;
 	}
 
 	std::cout << "\nSimulation ID: " << input.simulation_id << "\n";
