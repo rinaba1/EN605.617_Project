@@ -1,5 +1,6 @@
 NVCC = nvcc
-NVCCFLAGS = -std=c++17 -O2 -arch=sm_75 -Isrc
+ARCH ?= sm_75
+NVCCFLAGS = -std=c++17 -O2 -arch=$(ARCH) -Isrc
 
 all: golf_sim
 

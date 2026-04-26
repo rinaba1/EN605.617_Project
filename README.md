@@ -26,6 +26,12 @@ python3 scripts/plot_dispersion.py --sim-id <id>
 
 Or use **`bash scripts/run_pipeline.sh`**
 
+If you're building on a GPU other than `sm_75`, you can override the architecture:
+
+```bash
+make ARCH=sm_86
+```
+
 ## Limitations
 
 - **Simplified drag/magnus**: dimples on the golf balls are not accounted for.
