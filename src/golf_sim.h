@@ -17,6 +17,7 @@ struct LaunchInput {
 	float sidespin_rpm{};
 	float target_dist_yds{};
 	float target_radius_yds{};
+	int rng_seed{};
 };
 
 // constants (SI unless noted)

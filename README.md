@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ```bash
 make
-./golf_sim <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds>
+./golf_sim <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds> [seed]
 python3 scripts/plot_dispersion.py --sim-id <id>
 ```
 

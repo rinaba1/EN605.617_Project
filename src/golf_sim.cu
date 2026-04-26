@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -164,7 +165,17 @@ __global__ void simulateShot(LandingPoint *landing_points,
 static void print_usage(const char *prog) {
 	std::cout
 		<< "Usage:\n  " << prog
-		<< " <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds>\n";
+		<< " <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds> [seed]\n\n"
+		<< "Arguments:\n"
+		<< "  sim_id            Integer used for output file names\n"
+		<< "  seed              Optional RNG seed (int). If omitted, a random seed is used.\n";
+}
+
+static int default_seed() {
+	std::random_device rd;
+	const unsigned int a = rd();
+	const unsigned int b = rd();
+	return static_cast<int>(a ^ (b << 1));
 }
 
 static bool parse_args(int argc, char **argv, LaunchInput &out) {
@@ -175,8 +186,9 @@ static bool parse_args(int argc, char **argv, LaunchInput &out) {
 			return false;
 		}
 	}
-	if (argc != 8) {
-		std::cerr << "Error: expected 7 arguments, got " << (argc - 1) << ".\n";
+	if (argc != 8 && argc != 9) {
+		std::cerr << "Error: expected 7 or 8 arguments, got " << (argc - 1)
+				  << ".\n";
 		print_usage(argv[0]);
 		return false;
 	}
@@ -188,6 +200,7 @@ static bool parse_args(int argc, char **argv, LaunchInput &out) {
 		out.sidespin_rpm = std::stof(argv[5]);
 		out.target_dist_yds = std::stof(argv[6]);
 		out.target_radius_yds = std::stof(argv[7]);
+		out.rng_seed = (argc == 9) ? std::stoi(argv[8]) : default_seed();
 	} catch (...) {
 		std::cerr << "Error: failed to parse one or more arguments.\n";
 		print_usage(argv[0]);
@@ -233,7 +246,7 @@ int main(int argc, char **argv) {
 		(num_shots + threads_per_block - 1) / threads_per_block;
 	simulateShot<<<num_blocks, threads_per_block>>>(
 		d_landing_points, nominal_launch_velocity_mps, nominal_spin_rad_s,
-		num_shots, input.simulation_id);
+		num_shots, input.rng_seed);
 	CUDA_CHECK_KERNEL();
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -289,6 +302,7 @@ int main(int argc, char **argv) {
 	}
 
 	std::cout << "\nSimulation ID: " << input.simulation_id << "\n";
+	std::cout << "RNG Seed: " << input.rng_seed << "\n";
 	std::cout << "Avg Carry: " << (sum_carry_yds / num_shots) << " yds | "
 			  << "Avg Lateral: " << (sum_lateral_yds / num_shots) << " yds\n";
 	std::cout << "Hits in Target: "
@@ -301,6 +315,7 @@ int main(int argc, char **argv) {
 		std::ofstream jf(run_json);
 		jf << "{\n";
 		jf << "  \"simulation_id\": " << input.simulation_id << ",\n";
+		jf << "  \"rng_seed\": " << input.rng_seed << ",\n";
 		jf << "  \"ball_speed_mph\": " << input.ball_speed_mph << ",\n";
 		jf << "  \"launch_angle_deg\": " << input.launch_angle_deg << ",\n";
 		jf << "  \"backspin_rpm\": " << input.backspin_rpm << ",\n";
