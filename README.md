@@ -1,11 +1,11 @@
 # Monte Carlo Golf Shot Simulator
 
-Runs a Monte Carlo golf shot trajectory simulation using CUDA. Exports landing points and metadata to output files, and results are plotted using the `plot_dispersion.py` script.
+Runs a Monte Carlo golf shot trajectory simulation using CUDA. Exports landing points and metadata to output files, and results are plotted using `scripts/plot_dispersion.py`.
 
 ## Environment Setup
 
 - Make sure `nvcc` is installed
-- Python 3 is required to run the plotting script (`plot_dispersion.py`)
+- Python 3 is required to run the plotting script (`scripts/plot_dispersion.py`)
 
 Using a virtual environment is recommended:
 
@@ -21,10 +21,10 @@ pip install -r requirements.txt
 ```bash
 make
 ./golf_sim <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds>
-python3 plot_dispersion.py --sim-id <id>
+python3 scripts/plot_dispersion.py --sim-id <id>
 ```
 
-Or use **`./run_pipeline.sh`**
+Or use **`bash scripts/run_pipeline.sh`**
 
 ## Limitations
 
