@@ -12,27 +12,27 @@
 #include <string>
 #include <vector>
 
-#define CUDA_CHECK(expr)                                                      \
-	do {                                                                      \
+#define CUDA_CHECK(expr)                                                       \
+	do {                                                                       \
 		cudaError_t err__ = (expr);                                            \
 		if (err__ != cudaSuccess) {                                            \
-			std::cerr << "CUDA error: " << cudaGetErrorString(err__)           \
-					  << " (" << static_cast<int>(err__) << ") at "           \
-					  << __FILE__ << ":" << __LINE__ << "\n";                \
-			return 1;                                                         \
-		}                                                                     \
+			std::cerr << "CUDA error: " << cudaGetErrorString(err__) << " ("   \
+					  << static_cast<int>(err__) << ") at " << __FILE__ << ":" \
+					  << __LINE__ << "\n";                                     \
+			return 1;                                                          \
+		}                                                                      \
 	} while (0)
 
-#define CUDA_CHECK_KERNEL()                                                   \
-	do {                                                                      \
+#define CUDA_CHECK_KERNEL()                                                    \
+	do {                                                                       \
 		cudaError_t err__ = cudaGetLastError();                                \
 		if (err__ != cudaSuccess) {                                            \
 			std::cerr << "CUDA kernel launch error: "                          \
-					  << cudaGetErrorString(err__)                            \
-					  << " (" << static_cast<int>(err__) << ") at "           \
-					  << __FILE__ << ":" << __LINE__ << "\n";                \
-			return 1;                                                         \
-		}                                                                     \
+					  << cudaGetErrorString(err__) << " ("                     \
+					  << static_cast<int>(err__) << ") at " << __FILE__ << ":" \
+					  << __LINE__ << "\n";                                     \
+			return 1;                                                          \
+		}                                                                      \
 	} while (0)
 
 __global__ void simulateShot(LandingPoint *landing_points,
@@ -165,7 +165,8 @@ __global__ void simulateShot(LandingPoint *landing_points,
 static void print_usage(const char *prog) {
 	std::cout
 		<< "Usage:\n  " << prog
-		<< " <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds> [seed]\n\n"
+		<< " <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> "
+		   "<sidespin_rpm> <target_dist_yds> <target_radius_yds> [seed]\n\n"
 		<< "Arguments:\n"
 		<< "  sim_id            Integer used for output file names\n"
 		<< "  ball_speed_mph    Ball speed in mph\n"
@@ -174,7 +175,8 @@ static void print_usage(const char *prog) {
 		<< "  sidespin_rpm      Sidespin in rpm\n"
 		<< "  target_dist_yds   Target carry distance in yards\n"
 		<< "  target_radius_yds Target radius in yards\n"
-		<< "  seed              Optional RNG seed (int). If omitted, a random seed is used.\n";
+		<< "  seed              Optional RNG seed (int). If omitted, a random "
+		   "seed is used.\n";
 }
 
 static int default_seed() {
@@ -244,8 +246,8 @@ int main(int argc, char **argv) {
 
 	const int num_shots = NUM_MONTE_CARLO_SHOTS;
 	LandingPoint *d_landing_points = nullptr;
-	CUDA_CHECK(
-		cudaMalloc(&d_landing_points, (size_t)num_shots * sizeof(LandingPoint)));
+	CUDA_CHECK(cudaMalloc(&d_landing_points,
+						  (size_t)num_shots * sizeof(LandingPoint)));
 
 	const int threads_per_block = CUDA_THREADS_PER_BLOCK;
 	const int num_blocks =
