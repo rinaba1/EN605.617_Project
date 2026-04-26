@@ -9,6 +9,16 @@ struct LandingPoint {
 	float downrange_yds;
 };
 
+struct LaunchInput {
+	int simulation_id{};
+	float ball_speed_mph{};
+	float launch_angle_deg{};
+	float backspin_rpm{};
+	float sidespin_rpm{};
+	float target_dist_yds{};
+	float target_radius_yds{};
+};
+
 // constants (SI unless noted)
 static const float PI = 3.1415926535f;
 static const float AIR_DENSITY = 1.225f;				// kg/m^3

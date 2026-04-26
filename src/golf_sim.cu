@@ -161,16 +161,6 @@ __global__ void simulateShot(LandingPoint *landing_points,
 	landing_points[tid].downrange_yds = position_m.z * METERS_TO_YARDS;
 }
 
-struct LaunchInput {
-	int simulation_id{};
-	float ball_speed_mph{};
-	float launch_angle_deg{};
-	float backspin_rpm{};
-	float sidespin_rpm{};
-	float target_dist_yds{};
-	float target_radius_yds{};
-};
-
 static void print_usage(const char *prog) {
 	std::cout
 		<< "Usage:\n  " << prog
