@@ -76,7 +76,8 @@ __global__ void simulateShot(LandingPoint *landing_points,
 		const float rel_vz = velocity_mps.z - wind_mps.z;
 		const float air_rel_speed_sq =
 			rel_vx * rel_vx + rel_vy * rel_vy + rel_vz * rel_vz;
-		const float air_rel_speed = sqrtf(air_rel_speed_sq);
+		const float inv_air_speed = rsqrtf(air_rel_speed_sq);
+		const float air_rel_speed = air_rel_speed_sq * inv_air_speed;
 		if (air_rel_speed < MIN_AIR_REL_SPEED) {
 			break;
 		}
@@ -84,7 +85,6 @@ __global__ void simulateShot(LandingPoint *landing_points,
 		const float drag_force_magnitude = 0.5f * AIR_DENSITY *
 										   air_rel_speed_sq * DRAG_COEFFICIENT *
 										   BALL_CROSS_SECTION_AREA;
-		const float inv_air_speed = 1.0f / air_rel_speed;
 		const float3 force_drag_n =
 			make_float3(-rel_vx * inv_air_speed * drag_force_magnitude,
 						-rel_vy * inv_air_speed * drag_force_magnitude,
