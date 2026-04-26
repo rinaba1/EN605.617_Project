@@ -168,6 +168,12 @@ static void print_usage(const char *prog) {
 		<< " <sim_id> <ball_speed_mph> <launch_angle_deg> <backspin_rpm> <sidespin_rpm> <target_dist_yds> <target_radius_yds> [seed]\n\n"
 		<< "Arguments:\n"
 		<< "  sim_id            Integer used for output file names\n"
+		<< "  ball_speed_mph    Ball speed in mph\n"
+		<< "  launch_angle_deg  Launch angle in degrees\n"
+		<< "  backspin_rpm      Backspin in rpm\n"
+		<< "  sidespin_rpm      Sidespin in rpm\n"
+		<< "  target_dist_yds   Target carry distance in yards\n"
+		<< "  target_radius_yds Target radius in yards\n"
 		<< "  seed              Optional RNG seed (int). If omitted, a random seed is used.\n";
 }
 
