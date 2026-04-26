@@ -233,10 +233,9 @@ int main(int argc, char **argv) {
 		out << lateral_yds << ',' << carry_yds << '\n';
 
 		// hit test in landing plane
-		const float lateral_error_yds = lateral_yds;
 		const float downrange_error_yds = carry_yds - input.target_dist_yds;
 		const float distance_to_target_center =
-			sqrtf(lateral_error_yds * lateral_error_yds +
+			sqrtf(lateral_yds * lateral_yds +
 				  downrange_error_yds * downrange_error_yds);
 		if (distance_to_target_center <= input.target_radius_yds) {
 			++num_hits;
