@@ -11,6 +11,29 @@
 #include <string>
 #include <vector>
 
+#define CUDA_CHECK(expr)                                                      \
+	do {                                                                      \
+		cudaError_t err__ = (expr);                                            \
+		if (err__ != cudaSuccess) {                                            \
+			std::cerr << "CUDA error: " << cudaGetErrorString(err__)           \
+					  << " (" << static_cast<int>(err__) << ") at "           \
+					  << __FILE__ << ":" << __LINE__ << "\n";                \
+			return 1;                                                         \
+		}                                                                     \
+	} while (0)
+
+#define CUDA_CHECK_KERNEL()                                                   \
+	do {                                                                      \
+		cudaError_t err__ = cudaGetLastError();                                \
+		if (err__ != cudaSuccess) {                                            \
+			std::cerr << "CUDA kernel launch error: "                          \
+					  << cudaGetErrorString(err__)                            \
+					  << " (" << static_cast<int>(err__) << ") at "           \
+					  << __FILE__ << ":" << __LINE__ << "\n";                \
+			return 1;                                                         \
+		}                                                                     \
+	} while (0)
+
 __global__ void simulateShot(LandingPoint *landing_points,
 							 float3 base_launch_velocity_mps,
 							 float3 base_spin_rad_s, int num_shots,
@@ -195,7 +218,8 @@ int main(int argc, char **argv) {
 
 	const int num_shots = NUM_MONTE_CARLO_SHOTS;
 	LandingPoint *d_landing_points = nullptr;
-	cudaMalloc(&d_landing_points, (size_t)num_shots * sizeof(LandingPoint));
+	CUDA_CHECK(
+		cudaMalloc(&d_landing_points, (size_t)num_shots * sizeof(LandingPoint)));
 
 	const int threads_per_block = CUDA_THREADS_PER_BLOCK;
 	const int num_blocks =
@@ -203,12 +227,13 @@ int main(int argc, char **argv) {
 	simulateShot<<<num_blocks, threads_per_block>>>(
 		d_landing_points, nominal_launch_velocity_mps, nominal_spin_rad_s,
 		num_shots, input.simulation_id);
-	cudaDeviceSynchronize();
+	CUDA_CHECK_KERNEL();
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 	std::vector<LandingPoint> landings_yards((size_t)num_shots);
-	cudaMemcpy(landings_yards.data(), d_landing_points,
-			   (size_t)num_shots * sizeof(LandingPoint),
-			   cudaMemcpyDeviceToHost);
+	CUDA_CHECK(cudaMemcpy(landings_yards.data(), d_landing_points,
+						  (size_t)num_shots * sizeof(LandingPoint),
+						  cudaMemcpyDeviceToHost));
 
 	double sum_carry_yds = 0.0;
 	double sum_lateral_yds = 0.0;
@@ -268,6 +293,6 @@ int main(int argc, char **argv) {
 	std::cout << "Exported results to " << results_csv << " and " << run_json
 			  << "\n";
 
-	cudaFree(d_landing_points);
+	CUDA_CHECK(cudaFree(d_landing_points));
 	return 0;
 }
