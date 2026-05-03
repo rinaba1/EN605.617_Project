@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR/.."
 
 SIM_ID="${SIM_ID:-9999}"
 BALL_SPEED="${BALL_SPEED:-171}"
@@ -15,4 +16,4 @@ make
 
 ./golf_sim "${SIM_ID}" "${BALL_SPEED}" "${LAUNCH_ANGLE}" "${BACKSPIN}" "${SIDESPIN}" "${TARGET_DIST}" "${TARGET_RADIUS}"
 
-python3 plot_dispersion.py --sim-id "${SIM_ID}"
+python3 scripts/plot_dispersion.py --sim-id "${SIM_ID}"
